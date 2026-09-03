@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Native HTML Preview settings</title>
+    <link rel="stylesheet" href="sidepanel.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <img src="../assets/icons/icon-48.png" width="40" height="40" alt="">
+        <div>
+          <h1>Preview settings</h1>
+          <p>Native HTML Preview for GitHub</p>
+        </div>
+      </header>
+
+      <section aria-labelledby="active-content-title">
+        <label class="setting" for="active-content">
+          <span>
+            <strong id="active-content-title">Allow active content</strong>
+            <small>Run scripts and load external assets.</small>
+          </span>
+          <input id="active-content" type="checkbox" role="switch">
+        </label>
+        <p id="mode-description" class="mode-description" aria-live="polite"></p>
+      </section>
+
+      <section class="boundary" aria-labelledby="sandbox-title">
+        <h2 id="sandbox-title">Sandbox boundary</h2>
+        <p>
+          Preview code cannot access GitHub cookies, storage, page content, or
+          extension APIs. Active content can contact external servers.
+        </p>
+      </section>
+    </main>
+    <script src="sidepanel.js"></script>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Native HTML Preview for GitHub",
+  "version": "0.1.0",
+  "minimum_chrome_version": "116",
+  "description": "Preview HTML inline on GitHub with sandboxed scripts, private repository support, and no token or third-party renderer.",
+  "permissions": ["sidePanel", "storage"],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "action": {
+    "default_title": "Open Native HTML Preview settings",
+    "default_icon": {
+      "16": "assets/icons/icon-16.png",
+      "32": "assets/icons/icon-32.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel/index.html"
+  },
+  "icons": {
+    "16": "assets/icons/icon-16.png",
+    "32": "assets/icons/icon-32.png",
+    "48": "assets/icons/icon-48.png",
+    "128": "assets/icons/icon-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/*"],
+      "js": ["src/preview-security.js", "src/content.js"],
+      "css": ["src/content.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}
