@@ -2,7 +2,7 @@
 
 ## Persistent storage for sandboxed HTML previews
 
-The [HTML preview](src/content.js) keeps repository code in an opaque-origin iframe so rendered files cannot access GitHub cookies, storage, or DOM. Native `localStorage` therefore remains unavailable.
+The [HTML preview](src/preview-view.ts) keeps repository code in an opaque-origin iframe so rendered files cannot access GitHub cookies, storage, or DOM. Native `localStorage` therefore remains unavailable.
 
 Add a synchronous `localStorage`-compatible shim backed by [`chrome.storage.local`](https://developer.chrome.com/docs/extensions/reference/api/storage):
 

@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["chrome"],
+    "noEmit": false,
+    "noEmitOnError": true,
+    "rootDir": ".",
+    "outDir": "dist/extension"
+  },
+  "include": ["src/**/*.ts", "sidepanel/**/*.ts"],
+  "exclude": ["test"]
+}

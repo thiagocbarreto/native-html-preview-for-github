@@ -1,11 +1,25 @@
 {
   "name": "native-html-preview-for-github",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "Dependency-free Chrome extension for rendering repository HTML inline on GitHub.",
+  "description": "Chrome extension for rendering repository HTML inline on GitHub.",
   "scripts": {
-    "test": "node --test",
-    "check": "node --check src/background.js && node --check src/content.js && node --check src/preview-security.js && node --check sidepanel/sidepanel.js && node --test",
-    "package": "bash scripts/package.sh"
+    "build": "node scripts/build.mjs",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "npm run build && node --test test/unit/*.test.mts",
+    "test:e2e": "npm run build && playwright test",
+    "test:live": "npm run build && LIVE_GITHUB_E2E=1 playwright test test/e2e/live-github.spec.ts",
+    "check": "biome check . && npm run typecheck && npm test",
+    "package": "npm run build && bash scripts/package.sh"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.11",
+    "@playwright/test": "1.62.1",
+    "@types/chrome": "0.2.7",
+    "@types/node": "26.4.0",
+    "typescript": "7.0.2"
   }
 }

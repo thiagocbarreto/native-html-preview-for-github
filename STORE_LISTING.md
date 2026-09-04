@@ -28,8 +28,8 @@ Key features:
 - Use files from public or private repositories already open in your session.
 - Run inline and HTTPS-hosted JavaScript in an isolated sandbox.
 - Load relative and CDN-hosted styles, images, fonts, media, and libraries.
-- Show a clear warning whenever scripts and external network access are enabled.
-- Disable active content globally through Chrome's native side panel.
+- Show a clear active-content warning by default.
+- Control warning visibility and active content through Chrome's native side panel.
 - Share or refresh preview state through the page URL.
 - Switch back to Code or Blame without reloading the page.
 - Use no API token, extra account, external renderer, analytics, or tracking.

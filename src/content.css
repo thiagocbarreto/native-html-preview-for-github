@@ -7,7 +7,8 @@
   margin-bottom: 16px;
   overflow: hidden;
   background: #ffffff;
-  border: 1px solid var(--borderColor-default, var(--color-border-default, #d0d7de));
+  border: 1px solid
+    var(--borderColor-default, var(--color-border-default, #d0d7de));
   border-radius: 6px;
 }
 
@@ -18,8 +19,12 @@
   justify-content: space-between;
   padding: 10px 12px;
   color: var(--fgColor-attention, var(--color-attention-fg, #9a6700));
-  background: var(--bgColor-attention-muted, var(--color-attention-subtle, #fff8c5));
-  border-bottom: 1px solid var(--borderColor-attention-muted, var(--color-attention-muted, #d4a72c66));
+  background: var(
+    --bgColor-attention-muted,
+    var(--color-attention-subtle, #fff8c5)
+  );
+  border-bottom: 1px solid
+    var(--borderColor-attention-muted, var(--color-attention-muted, #d4a72c66));
   font-size: 12px;
 }
 
@@ -28,9 +33,13 @@
   padding: 4px 8px;
   color: var(--button-default-fgColor-rest, var(--color-btn-text, #1f2328));
   background: var(--button-default-bgColor-rest, var(--color-btn-bg, #f6f8fa));
-  border: 1px solid var(--button-default-borderColor-rest, var(--color-btn-border, #d0d7de));
+  border: 1px solid
+    var(--button-default-borderColor-rest, var(--color-btn-border, #d0d7de));
   border-radius: 6px;
-  box-shadow: var(--button-default-shadow-resting, var(--color-btn-shadow, 0 1px 0 rgb(31 35 40 / 4%)));
+  box-shadow: var(
+    --button-default-shadow-resting,
+    var(--color-btn-shadow, 0 1px 0 rgb(31 35 40 / 4%))
+  );
   font: inherit;
   font-weight: 600;
   cursor: pointer;

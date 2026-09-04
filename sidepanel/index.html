@@ -22,9 +22,29 @@
             <strong id="active-content-title">Allow active content</strong>
             <small>Run scripts and load external assets.</small>
           </span>
-          <input id="active-content" type="checkbox" role="switch">
+          <input
+            id="active-content"
+            type="checkbox"
+            role="switch"
+            aria-checked="true"
+          >
         </label>
         <p id="mode-description" class="mode-description" aria-live="polite"></p>
+      </section>
+
+      <section aria-labelledby="warning-title">
+        <label class="setting" for="show-warning">
+          <span>
+            <strong id="warning-title">Show active-content warning</strong>
+            <small>Display the security notice above active previews.</small>
+          </span>
+          <input
+            id="show-warning"
+            type="checkbox"
+            role="switch"
+            aria-checked="true"
+          >
+        </label>
       </section>
 
       <section class="boundary" aria-labelledby="sandbox-title">

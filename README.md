@@ -11,6 +11,7 @@ statistics, and native controls stay visible.
 
 ## Contents
 
+- [Install](#install)
 - [Features](#features)
 - [Security model](#security-model)
 - [Permissions](#permissions)
@@ -20,6 +21,10 @@ statistics, and native controls stay visible.
 - [Independence](#independence)
 - [License](#license)
 
+## Install
+
+Install [Native HTML Preview for GitHub from the Chrome Web Store](https://chromewebstore.google.com/detail/native-html-preview-for-g/eogkbedpfhpdjlbmehjfigaehdaieaca).
+
 ## Features
 
 - Supports `.html`, `.htm`, and `.xhtml` files on blob and blame pages.
@@ -28,8 +33,8 @@ statistics, and native controls stay visible.
 - Resolves relative assets from the file's raw URL.
 - Runs inline and HTTPS-hosted scripts in an isolated frame by default.
 - Loads HTTPS styles, images, fonts, media, and API requests by default.
-- Provides a Chrome side-panel setting for restricted previews.
-- Uses no API token, extra account, build step, or runtime dependency.
+- Provides Chrome side-panel settings for restricted previews and warning visibility.
+- Uses no API token, extra account, or runtime dependency.
 
 ## Security model
 
@@ -38,9 +43,10 @@ GitHub cookies, storage, DOM, or extension APIs. Frames, objects, forms, popups,
 and top-level navigation remain blocked.
 
 Active mode is the default because most HTML documents depend on external
-assets. A warning above every active preview states that the file can run
-scripts and contact external servers. Only preview active HTML you trust,
-especially in private repositories.
+assets. By default, a warning above active previews states that the file can run
+scripts and contact external servers. The side panel can hide this warning
+without changing the sandbox. Only preview active HTML you trust, especially in
+private repositories.
 
 Turn off **Allow active content** in Chrome's extension side panel for restricted
 mode. Restricted previews remove JavaScript and block external network access;
@@ -59,22 +65,30 @@ No repository content is stored through the `storage` permission.
 
 ## Load unpacked
 
-1. Open `chrome://extensions`.
-2. Enable **Developer mode**.
-3. Click **Load unpacked**.
-4. Select this repository's root directory.
-5. Open an HTML file on GitHub and click **HTML**.
+1. Run `npm ci --ignore-scripts`.
+2. Run `npm run build`.
+3. Open `chrome://extensions`.
+4. Enable **Developer mode**.
+5. Click **Load unpacked**.
+6. Select `dist/extension`.
+7. Open an HTML file on GitHub and click **HTML**.
 
 Reload the extension and refresh GitHub after changing source files.
 
 ## Development
 
-Run dependency-free checks with:
+Install pinned development tools and run formatting, linting, type checks, unit
+tests, and browser tests:
 
 ```sh
 nvm use
+npm ci --ignore-scripts
+npx --no-install playwright install chromium
 npm run check
 ```
+
+Run the opt-in smoke test against the current public GitHub UI with
+`npm run test:live`.
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for browser checks and
 [`SECURITY.md`](SECURITY.md) for private vulnerability reporting.
@@ -89,17 +103,20 @@ The package and its SHA-256 checksum are written under `dist/`.
 
 ## Project structure
 
-- [`manifest.json`](manifest.json) defines the dependency-free Manifest V3
-  extension.
-- [`src/content.js`](src/content.js) owns GitHub integration, source loading,
-  settings, and preview lifecycle.
-- [`src/preview-security.js`](src/preview-security.js) owns document hardening
-  and mode-specific Content Security Policy.
-- [`src/content.css`](src/content.css) owns the inline preview presentation.
-- [`sidepanel/index.html`](sidepanel/index.html) exposes the global active-content
-  setting through Chrome's native side panel.
-- [`scripts/package.sh`](scripts/package.sh) creates the release ZIP from the
-  committed extension files.
+- [`manifest.json`](manifest.json) defines the Manifest V3 extension.
+- [`src/content.ts`](src/content.ts) coordinates GitHub navigation, settings, and
+  preview lifecycle.
+- [`src/github-source.ts`](src/github-source.ts) reads and validates the current
+  repository file.
+- [`src/preview-security.ts`](src/preview-security.ts) hardens documents and
+  defines mode-specific Content Security Policy.
+- [`src/preview-view.ts`](src/preview-view.ts) owns the source swap and trusted
+  UI around the sandbox.
+- [`sidepanel/sidepanel.ts`](sidepanel/sidepanel.ts) owns the active-content
+  setting.
+- [`test/e2e`](test/e2e) exercises the built extension in Chromium.
+- [`scripts/build.mjs`](scripts/build.mjs) creates the unpacked extension.
+- [`scripts/package.sh`](scripts/package.sh) creates the release ZIP.
 - [`STORE_LISTING.md`](STORE_LISTING.md) contains Chrome Web Store copy and
   submission fields.
 - [`PRIVACY_POLICY.md`](PRIVACY_POLICY.md) documents data handling.

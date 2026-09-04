@@ -7,14 +7,14 @@ Report security problems through the private process in
 
 ## Development
 
-The extension uses browser APIs and plain JavaScript with no build step or
-installed dependencies.
+The extension uses TypeScript, Biome, and Playwright during development. The
+packaged extension has no runtime dependency.
 
 1. Fork and clone the [repository](https://github.com/thiagocbarreto/native-html-preview-for-github).
-2. Run `npm test`.
-3. Load the repository root through `chrome://extensions`.
-4. Test one blob page, one blame page, and GitHub soft navigation.
-5. Test both active and restricted preview modes.
+2. Run `npm ci --ignore-scripts`.
+3. Run `npx --no-install playwright install chromium`.
+4. Run `npm run check`.
+5. Load `dist/extension` through `chrome://extensions` when testing manually.
 
 Keep changes within the extension's single purpose: rendering repository HTML
 inside GitHub. Update privacy and store disclosures whenever permissions,

@@ -3,12 +3,18 @@
 (() => {
   'use strict';
 
-  function buildDocument(html, baseUrl, activeContentEnabled) {
+  function buildDocument(
+    html: string,
+    baseUrl: string,
+    activeContentEnabled: boolean
+  ): string {
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    doc.querySelectorAll('iframe, frame, object, embed').forEach((node) =>
-      node.remove()
-    );
-    doc.querySelectorAll('base').forEach((node) => node.remove());
+    doc.querySelectorAll('iframe, frame, object, embed').forEach((node) => {
+      node.remove();
+    });
+    doc.querySelectorAll('base').forEach((node) => {
+      node.remove();
+    });
     doc.querySelectorAll('meta[http-equiv]').forEach((meta) => {
       if ((meta.getAttribute('http-equiv') || '').toLowerCase() === 'refresh') {
         meta.remove();
@@ -16,7 +22,9 @@
     });
 
     if (!activeContentEnabled) {
-      doc.querySelectorAll('script').forEach((script) => script.remove());
+      doc.querySelectorAll('script').forEach((script) => {
+        script.remove();
+      });
       doc.querySelectorAll('*').forEach((element) => {
         for (const attribute of [...element.attributes]) {
           if (attribute.name.toLowerCase().startsWith('on')) {
@@ -25,7 +33,8 @@
         }
       });
       doc.querySelectorAll('a[href], area[href]').forEach((link) => {
-        if (!link.getAttribute('href').trim().startsWith('#')) {
+        const href = link.getAttribute('href');
+        if (href && !href.trim().startsWith('#')) {
           link.removeAttribute('href');
         }
         link.removeAttribute('ping');
@@ -40,13 +49,15 @@
     doc.head.prepend(base);
     doc.head.prepend(policy);
 
-    return '<!doctype html>\n' + doc.documentElement.outerHTML;
+    return `<!doctype html>\n${doc.documentElement.outerHTML}`;
   }
 
-  function trustedRawUrl(value, pageHref) {
+  function trustedRawUrl(value: string, pageHref: string): string {
     const pageUrl = new URL(pageHref);
     const page = pageUrl.pathname.match(/^\/([^/]+)\/([^/]+)\//);
-    let url;
+    const owner = page?.[1];
+    const repository = page?.[2];
+    let url: URL;
     try {
       url = new URL(value, pageUrl);
     } catch {
@@ -55,9 +66,10 @@
 
     const parts = url.pathname.split('/').filter(Boolean);
     const sameRepository =
-      page &&
-      parts[0]?.toLowerCase() === page[1].toLowerCase() &&
-      parts[1]?.toLowerCase() === page[2].toLowerCase();
+      owner !== undefined &&
+      repository !== undefined &&
+      parts[0]?.toLowerCase() === owner.toLowerCase() &&
+      parts[1]?.toLowerCase() === repository.toLowerCase();
     const isGitHubRaw =
       url.origin === 'https://github.com' && parts[2] === 'raw';
     const isRawHost = url.origin === 'https://raw.githubusercontent.com';
@@ -67,7 +79,7 @@
     return url.href;
   }
 
-  function contentSecurityPolicy(activeContentEnabled) {
+  function contentSecurityPolicy(activeContentEnabled: boolean): string {
     const sources = activeContentEnabled
       ? [
           "style-src 'unsafe-inline' https:",
@@ -96,9 +108,14 @@
     ].join('; ');
   }
 
-  globalThis.NativeHtmlPreviewSecurity = Object.freeze({
+  const api: NativeHtmlPreviewSecurityApi = Object.freeze({
     buildDocument,
     contentSecurityPolicy,
     trustedRawUrl,
   });
+  (
+    globalThis as typeof globalThis & {
+      NativeHtmlPreviewSecurity: NativeHtmlPreviewSecurityApi;
+    }
+  ).NativeHtmlPreviewSecurity = api;
 })();

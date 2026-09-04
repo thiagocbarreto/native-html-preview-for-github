@@ -3,14 +3,19 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import vm from 'node:vm';
 
+interface PreviewSecurity {
+  contentSecurityPolicy(activeContentEnabled: boolean): string;
+  trustedRawUrl(value: string, pageHref: string): string;
+}
+
 const source = await readFile(
-  new URL('../src/preview-security.js', import.meta.url),
+  new URL('../../dist/extension/src/preview-security.js', import.meta.url),
   'utf8'
 );
 const context = vm.createContext({ URL });
 vm.runInContext(source, context);
 const { contentSecurityPolicy, trustedRawUrl } =
-  context.NativeHtmlPreviewSecurity;
+  context.NativeHtmlPreviewSecurity as PreviewSecurity;
 
 test('active mode allows secure scripts, assets, and connections', () => {
   const policy = contentSecurityPolicy(true);
@@ -44,7 +49,10 @@ test('raw source URLs stay within the current repository', () => {
   const page = 'https://github.com/owner/repo/blob/main/docs/page.html';
 
   assert.equal(
-    trustedRawUrl('https://github.com/owner/repo/raw/main/docs/page.html', page),
+    trustedRawUrl(
+      'https://github.com/owner/repo/raw/main/docs/page.html',
+      page
+    ),
     'https://github.com/owner/repo/raw/main/docs/page.html'
   );
   assert.equal(
