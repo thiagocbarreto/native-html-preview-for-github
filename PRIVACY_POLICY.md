@@ -1,7 +1,7 @@
 # Privacy Policy
 
-Native HTML Preview for GitHub does not collect, sell, transfer, or persist
-personal data.
+Native HTML Preview for GitHub does not send user data to the developer or any
+developer-controlled service.
 
 ## Data handled
 
@@ -16,6 +16,13 @@ active content is enabled. It does not persist repository content.
 The extension has no analytics, account, API token, advertising, or developer
 server. GitHub page and file content is used only to provide the preview and is
 not transferred for unrelated purposes.
+
+## Limited use
+
+Use of website content complies with the Chrome Web Store User Data Policy,
+including its Limited Use requirements. The extension accesses content only to
+render the file selected by the user. It does not use content for advertising,
+credit decisions, profiling, or any unrelated purpose.
 
 ## Preview network requests
 
