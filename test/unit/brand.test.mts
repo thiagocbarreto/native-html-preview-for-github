@@ -58,6 +58,7 @@ test('brand assets use the selected colors', async () => {
     [
       'assets/icon.svg',
       'assets/store/promo-small.svg',
+      'assets/store/promo-marquee.svg',
       'sidepanel/sidepanel.css',
     ].map((path) => readFile(new URL(path, root), 'utf8'))
   );
@@ -81,5 +82,15 @@ test('manifest icons match their declared pixel sizes', async () => {
       width: size,
       height: size,
     });
+  }
+});
+
+test('store promotional images match Chrome dimensions', async () => {
+  for (const [file, width, height] of [
+    ['promo-small-440x280.png', 440, 280],
+    ['promo-marquee-1400x560.png', 1400, 560],
+  ] as const) {
+    const image = await readFile(new URL(`assets/store/${file}`, root));
+    assert.deepEqual(pngDimensions(image), { width, height });
   }
 });

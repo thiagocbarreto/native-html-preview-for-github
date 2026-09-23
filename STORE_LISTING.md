@@ -78,7 +78,7 @@ the distinctive **Native** prefix in a store with several products named
 - 128 × 128 store icon: [`assets/icons/icon-128.png`](assets/icons/icon-128.png)
 - 1280 × 800 screenshot: [`assets/store/native-html-preview-store-html-tab-active-20260903-1444.png`](assets/store/native-html-preview-store-html-tab-active-20260903-1444.png)
 - 440 × 280 promotional tile: [`assets/store/promo-small-440x280.png`](assets/store/promo-small-440x280.png)
-- Optional 1400 × 560 marquee image
+- Optional 1400 × 560 marquee image: [`assets/store/promo-marquee-1400x560.png`](assets/store/promo-marquee-1400x560.png)
 
 Screenshots must show the real extension UI and current behavior. Use an
 independent visual identity rather than GitHub's logo.
