@@ -1,5 +1,9 @@
 # Native HTML Preview for GitHub
 
+<p align="center">
+  <img src="assets/icon.svg" width="128" height="128" alt="Native HTML Preview for GitHub logo">
+</p>
+
 Preview repository HTML files inside [GitHub](https://github.com) without a
 download, API token, or third-party renderer.
 
@@ -104,6 +108,7 @@ The package and its SHA-256 checksum are written under `dist/`.
 ## Project structure
 
 - [`manifest.json`](manifest.json) defines the Manifest V3 extension.
+- [`brand.json`](brand.json) defines the colors, standard palette, and logo.
 - [`src/content.ts`](src/content.ts) coordinates GitHub navigation, settings, and
   preview lifecycle.
 - [`src/github-source.ts`](src/github-source.ts) reads and validates the current

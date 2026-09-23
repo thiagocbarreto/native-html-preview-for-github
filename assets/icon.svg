@@ -1,8 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
-  <title>HTML document preview</title>
-  <rect width="128" height="128" rx="24" fill="#0d1117"/>
-  <path d="M30 16h48l22 22v74H30z" fill="#f6f8fa"/>
-  <path d="M78 16v22h22" fill="#d0d7de"/>
-  <path d="M53 53 40 64l13 11M75 53l13 11-13 11M69 47 59 81" fill="none" stroke="#1f883d" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M42 94h44" fill="none" stroke="#8c959f" stroke-width="6" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title description">
+  <title id="title">Native HTML Preview for GitHub</title>
+  <desc id="description">An angular markup signal resolves into a complete visual element.</desc>
+  <rect data-brand-role="background" x="1" y="1" width="126" height="126" rx="27" fill="#FAFAF7" stroke="#E5E4DF" stroke-width="2"/>
+  <path data-brand-role="primary" d="M50 38 24 64l26 26" fill="none" stroke="#6C3CE9" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle data-brand-role="secondary" cx="86" cy="64" r="23" fill="#C026D3"/>
 </svg>

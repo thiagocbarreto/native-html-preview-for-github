@@ -1,0 +1,81 @@
+{
+  "source": {
+    "createdBy": "brand-personal",
+    "skillVersion": 1,
+    "skillSource": "workstation/home/.claude/skills/brand-personal",
+    "standardPaletteVersion": 1
+  },
+  "product": {
+    "name": "Native HTML Preview for GitHub",
+    "description": "Preview repository HTML in place on GitHub without sending source to another renderer."
+  },
+  "colors": {
+    "brand": {
+      "primary": {
+        "name": "Render Violet",
+        "light": "#C9B8FF",
+        "base": "#6C3CE9",
+        "dark": "#351879"
+      },
+      "secondary": {
+        "name": "Neon Magenta",
+        "light": "#F5D0FE",
+        "base": "#C026D3",
+        "dark": "#701A75"
+      }
+    },
+    "standard": {
+      "version": 1,
+      "neutral": {
+        "black": {
+          "name": "Slate",
+          "dark": "#191919",
+          "medium": "#262625",
+          "light": "#40403E"
+        },
+        "gray": {
+          "name": "Cloud",
+          "dark": "#666663",
+          "medium": "#91918D",
+          "light": "#BFBFBA"
+        },
+        "white": {
+          "name": "Ivory",
+          "dark": "#E5E4DF",
+          "medium": "#F0F0EB",
+          "light": "#FAFAF7"
+        }
+      },
+      "red": {
+        "light": "#FEF2F2",
+        "base": "#DC2626",
+        "dark": "#991B1B",
+        "use": "Errors and destructive actions"
+      },
+      "green": {
+        "light": "#F0FDF4",
+        "base": "#16A34A",
+        "dark": "#166534",
+        "use": "Success and healthy states"
+      },
+      "blue": {
+        "light": "#EFF6FF",
+        "base": "#2563EB",
+        "dark": "#1E40AF",
+        "use": "Information and neutral notifications"
+      },
+      "amber": {
+        "light": "#FFFBEB",
+        "base": "#D97706",
+        "dark": "#92400E",
+        "use": "Warnings and states that need attention"
+      }
+    }
+  },
+  "logo": {
+    "name": "Markup Resolves",
+    "concept": "An angular markup signal resolves into a complete visual element, capturing the change from HTML syntax to rendered content.",
+    "geometry": ["rounded rectangle", "line", "circle"],
+    "source": "assets/icon.svg"
+  }
+}
