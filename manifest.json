@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Native HTML Preview for GitHub",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "minimum_chrome_version": "116",
   "description": "Preview HTML inline on GitHub with sandboxed scripts, private repository support, and no token or third-party renderer.",
   "permissions": ["sidePanel", "storage"],

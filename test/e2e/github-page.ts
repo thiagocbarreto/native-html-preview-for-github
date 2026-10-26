@@ -24,7 +24,18 @@ function previewSource(assetOrigin: string): string {
 </html>`;
 }
 
-export function githubFilePage(assetOrigin: string): string {
+export function githubFilePage(
+  assetOrigin: string,
+  classNames: 'unprefixed' | 'module-prefixed' = 'unprefixed'
+): string {
+  const wrapperClass =
+    classNames === 'unprefixed'
+      ? 'blobContentWrapper__Nr-ksB'
+      : 'BlobViewContent-module__blobContentWrapper';
+  const sourceClass =
+    classNames === 'unprefixed'
+      ? 'blobContentSection__g1-z7P'
+      : 'BlobContent-module__blobContentSection';
   const payload = JSON.stringify({
     payload: {
       blob: {
@@ -50,8 +61,9 @@ export function githubFilePage(assetOrigin: string): string {
       </li>
     </ul>
     <a data-testid="raw-button" href="https://github.com/test/repo/raw/main/index.html">Raw</a>
-    <main class="BlobViewContent-module__blobContentWrapper">
-      <section class="BlobContent-module__blobContentSection">
+    <main class="${wrapperClass}">
+      <p id="file-metadata">File details</p>
+      <section class="${sourceClass}">
         <pre id="source">HTML source</pre>
       </section>
     </main>

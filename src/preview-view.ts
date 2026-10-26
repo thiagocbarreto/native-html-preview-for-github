@@ -3,10 +3,8 @@
 (() => {
   'use strict';
 
-  const CONTENT_CONTAINER_SELECTOR =
-    '[class*="BlobViewContent-module__blobContentWrapper"]';
-  const SOURCE_CONTENT_SELECTOR =
-    '[class*="BlobContent-module__blobContentSection"]';
+  const CONTENT_CONTAINER_SELECTOR = '[class*="blobContentWrapper"]';
+  const SOURCE_CONTENT_SELECTOR = '[class*="blobContentSection"]';
   const PREVIEW_CLASS = 'native-html-preview';
   const SOURCE_HIDDEN_CLASS = 'native-html-source-hidden';
 

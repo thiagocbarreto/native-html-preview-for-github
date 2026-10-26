@@ -25,6 +25,8 @@ test('renders active repository HTML inside the isolated frame', async ({
   await page.getByRole('button', { name: 'HTML', exact: true }).click();
 
   await expect(page).toHaveURL(`${blobUrl}?native-html=preview`);
+  await expect(page.locator('#source')).toBeHidden();
+  await expect(page.locator('#file-metadata')).toBeVisible();
   await expect(page.getByRole('status')).toContainText(
     'Active content enabled'
   );
@@ -51,6 +53,29 @@ test('renders active repository HTML inside the isolated frame', async ({
       () => typeof chrome === 'undefined' || chrome.runtime === undefined
     )
   ).toBe(true);
+});
+
+test('renders and restores source with module-prefixed GitHub classes', async ({
+  assetServer,
+  page,
+}) => {
+  await page.route(`${blobUrl}*`, (route) =>
+    route.fulfill({
+      contentType: 'text/html',
+      body: githubFilePage(assetServer.origin, 'module-prefixed'),
+    })
+  );
+  await page.goto(`${blobUrl}?native-html=preview`);
+
+  await expect(page.locator('#source')).toBeHidden();
+  await expect(page.locator('#file-metadata')).toBeVisible();
+  await expect(
+    page.frameLocator('.native-html-preview__frame').locator('#inline-status')
+  ).toHaveText('Inline script ran');
+
+  await page.getByRole('button', { name: 'Code', exact: true }).click();
+  await expect(page.locator('#source')).toBeVisible();
+  await expect(page.locator('.native-html-preview')).toHaveCount(0);
 });
 
 test('warning setting hides trusted notice without disabling scripts', async ({
