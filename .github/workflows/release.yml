@@ -1,0 +1,103 @@
+name: Chrome Web Store
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out release
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Check release tag
+        run: node -e 'if (process.env.GITHUB_REF !== "refs/tags/v" + require("./manifest.json").version) process.exit(1)'
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+      - name: Install Chromium
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Validate extension
+        run: npm run check
+      - name: Package extension
+        run: npm run package
+      - name: Save tested package
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: chrome-store-package
+          path: dist/native-html-preview-for-github-*.zip
+          if-no-files-found: error
+
+  store:
+    needs: build
+    if: ${{ !cancelled() && (needs.build.result == 'success' || needs.build.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: chrome-web-store
+    concurrency:
+      group: chrome-web-store
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      CWS_PUBLISHER_ID: ${{ vars.CWS_PUBLISHER_ID }}
+      CWS_ITEM_ID: ${{ vars.CWS_ITEM_ID }}
+      CWS_PUBLISH_ENABLED: ${{ vars.CWS_PUBLISH_ENABLED }}
+    steps:
+      - name: Check out release tooling
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version-file: .nvmrc
+      - name: Download tested package
+        if: github.event_name == 'push' && vars.CWS_PUBLISH_ENABLED == 'true'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: chrome-store-package
+          path: dist
+      - name: Authenticate without a stored credential
+        id: auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093
+        with:
+          workload_identity_provider: ${{ vars.CWS_WIF_PROVIDER }}
+          service_account: ${{ vars.CWS_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_scopes: ${{ github.event_name == 'push' && vars.CWS_PUBLISH_ENABLED == 'true' && 'https://www.googleapis.com/auth/chromewebstore' || 'https://www.googleapis.com/auth/chromewebstore.readonly' }}
+          create_credentials_file: false
+          export_environment_variables: false
+      - name: Check store access or submit the approved release
+        env:
+          CWS_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+          CWS_LOG_DIR: ${{ runner.temp }}/chrome-store-logs
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == push && "$CWS_PUBLISH_ENABLED" == true ]]; then
+            version="${GITHUB_REF#refs/tags/v}"
+            export CWS_ZIP_PATH="dist/native-html-preview-for-github-$version.zip"
+            node scripts/chrome-store.mts --publish
+          else
+            node scripts/chrome-store.mts
+          fi
+      - name: Save credential-free release logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: chrome-store-logs
+          path: ${{ runner.temp }}/chrome-store-logs
+          if-no-files-found: ignore

@@ -3,6 +3,7 @@
   "compilerOptions": {
     "types": ["chrome"],
     "noEmit": false,
+    "allowImportingTsExtensions": false,
     "noEmitOnError": true,
     "rootDir": ".",
     "outDir": "dist/extension"

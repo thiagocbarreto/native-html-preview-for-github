@@ -21,6 +21,7 @@ statistics, and native controls stay visible.
 - [Permissions](#permissions)
 - [Load unpacked](#load-unpacked)
 - [Development](#development)
+- [Release automation](#release-automation)
 - [Project structure](#project-structure)
 - [Independence](#independence)
 - [License](#license)
@@ -104,6 +105,10 @@ npm run package
 ```
 
 The package and its SHA-256 checksum are written under `dist/`.
+
+## Release automation
+
+[Chrome Web Store releases](docs/CHROME_STORE_RELEASES.md) documents keyless GitHub authentication, read-only access checks, environment approval, release tags, and recovery. Publishing is disabled until the deployment environment explicitly enables it.
 
 ## Project structure
 
