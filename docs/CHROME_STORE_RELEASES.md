@@ -42,6 +42,8 @@ Before the first release, verify this check succeeds and shows the expected exte
 
 The build checks the tag, runs the full test suite, and packages a clean checkout. Only its ZIP artifact reaches the publishing job. One concurrency group serializes this workflow's store jobs. Do not upload through the dashboard or another tool while a release is running: the API publishes the latest uploaded package and does not accept a version or package digest in its publish request.
 
+Other callers of the [store script](../scripts/chrome-store.mts) can authorize manual tag releases with `CWS_MANUAL_PUBLISH_CONFIRMED=true` and `--publish`; the publishing opt-in and exact version-tag checks still apply. This repository's manual workflow entrypoint remains read-only.
+
 The [store script](../scripts/chrome-store.mts) skips a version already published, pending review, or staged. It refuses lower versions, another active submission, ambiguous revisions, policy-enforced items, and uploads already in progress. Upload processing has a bounded poll; review itself is not polled in a long-running Actions job. Warnings block submission.
 
 ## Failure and rollback

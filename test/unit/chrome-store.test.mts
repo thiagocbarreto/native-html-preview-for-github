@@ -241,7 +241,7 @@ test('Chrome versions compare numerically with missing components padded', () =>
   }
 });
 
-test('publishing requires both opt-in and the exact release-tag push', () => {
+test('publishing requires opt-in, an exact version tag, and an approved trigger', () => {
   const allowed = {
     CWS_PUBLISH_ENABLED: 'true',
     GITHUB_EVENT_NAME: 'push',
@@ -256,7 +256,30 @@ test('publishing requires both opt-in and the exact release-tag push', () => {
   ]) {
     assert.throws(
       () => assertPublishAllowed({ ...allowed, ...overrides }, '0.2.1'),
-      /enabled release-tag push/
+      /enabled release tag/
+    );
+  }
+});
+
+test('manual publishing needs an explicit confirmation and cannot publish main', () => {
+  const manual = {
+    CWS_PUBLISH_ENABLED: 'true',
+    CWS_MANUAL_PUBLISH_CONFIRMED: 'true',
+    GITHUB_EVENT_NAME: 'workflow_dispatch',
+    GITHUB_REF: 'refs/tags/v0.2.1',
+  };
+  assert.doesNotThrow(() => assertPublishAllowed(manual, '0.2.1'));
+  for (const overrides of [
+    { CWS_MANUAL_PUBLISH_CONFIRMED: 'false' },
+    { CWS_MANUAL_PUBLISH_CONFIRMED: '' },
+    { CWS_PUBLISH_ENABLED: 'false' },
+    { GITHUB_EVENT_NAME: 'pull_request' },
+    { GITHUB_REF: 'refs/heads/main' },
+    { GITHUB_REF: 'refs/tags/v0.2.2' },
+  ]) {
+    assert.throws(
+      () => assertPublishAllowed({ ...manual, ...overrides }, '0.2.1'),
+      /enabled release tag/
     );
   }
 });

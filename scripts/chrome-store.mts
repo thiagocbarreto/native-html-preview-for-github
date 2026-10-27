@@ -261,13 +261,17 @@ export function assertPublishAllowed(
   environment: NodeJS.ProcessEnv,
   version: string
 ): void {
+  const approvedTrigger =
+    environment.GITHUB_EVENT_NAME === 'push' ||
+    (environment.GITHUB_EVENT_NAME === 'workflow_dispatch' &&
+      environment.CWS_MANUAL_PUBLISH_CONFIRMED === 'true');
   if (
     environment.CWS_PUBLISH_ENABLED !== 'true' ||
-    environment.GITHUB_EVENT_NAME !== 'push' ||
+    !approvedTrigger ||
     environment.GITHUB_REF !== `refs/tags/v${version}`
   ) {
     throw new Error(
-      'Publishing requires an enabled release-tag push matching the package version'
+      'Publishing requires an enabled release tag matching the package version and an approved trigger'
     );
   }
 }
