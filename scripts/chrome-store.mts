@@ -41,6 +41,26 @@ function object(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
+function safeStoreError(value: unknown): string | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return;
+  const error = Reflect.get(value, 'error');
+  if (!error || typeof error !== 'object' || Array.isArray(error)) return;
+  const status = Reflect.get(error, 'status');
+  const message = Reflect.get(error, 'message');
+  const parts: string[] = [];
+  if (typeof status === 'string' && /^[A-Z_]+$/.test(status))
+    parts.push(status);
+  if (typeof message === 'string') {
+    parts.push(
+      message
+        .replace(/[\r\n\t]+/g, ' ')
+        .replace(/(?:Bearer\s+|ya29\.|AIza)[A-Za-z0-9._-]+/g, '[REDACTED]')
+        .slice(0, 500)
+    );
+  }
+  return parts.length > 0 ? parts.join(': ') : undefined;
+}
+
 export function versionParts(version: string): number[] {
   if (!/^(0|[1-9]\d*)(\.(0|[1-9]\d*)){0,3}$/.test(version)) {
     throw new Error('Invalid Chrome extension version');
@@ -124,8 +144,13 @@ export function createStore(
         );
       });
     if (!response.ok) {
+      const summary = await response
+        .clone()
+        .json()
+        .then(safeStoreError)
+        .catch(() => undefined);
       throw new Error(
-        `Store ${suffix} failed (HTTP ${response.status}); check publisher access and the developer dashboard`
+        `Store ${suffix} failed (HTTP ${response.status})${summary ? `: ${summary}` : ''}; check publisher access and the developer dashboard`
       );
     }
     return object(await response.json());

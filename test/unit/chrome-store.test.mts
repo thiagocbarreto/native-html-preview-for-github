@@ -235,6 +235,28 @@ test('HTTP failures never include raw response contents in errors', async () => 
   assert.deepEqual(messages, []);
 });
 
+test('HTTP failures expose only a sanitized store error summary', async () => {
+  const { store } = harness([
+    Response.json(
+      {
+        error: {
+          status: 'INVALID_ARGUMENT',
+          message: 'Fix the listing before retrying ya29.fixture-secret',
+          ignored: 'private diagnostic details',
+        },
+      },
+      { status: 400 }
+    ),
+  ]);
+  await assert.rejects(store.status(), (error) => {
+    assert.ok(error instanceof Error);
+    assert.match(error.message, /INVALID_ARGUMENT: Fix the listing/);
+    assert.match(error.message, /\[REDACTED\]/);
+    assert.doesNotMatch(error.message, /fixture-secret|private diagnostic/);
+    return true;
+  });
+});
+
 test('policy enforcement, malformed versions, and ambiguous channels fail closed', async () => {
   for (const payload of [
     { takenDown: true },
