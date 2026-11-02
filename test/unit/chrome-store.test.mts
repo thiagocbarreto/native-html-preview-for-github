@@ -44,9 +44,11 @@ function harness(
       fetch: async (input, init) => {
         assert.ok(init);
         calls.push({ url: String(input), init });
-        assert.equal(
-          new URL(String(input)).origin,
-          'https://chromewebstore.googleapis.com'
+        assert.ok(
+          [
+            'https://chromewebstore.googleapis.com',
+            'https://www.googleapis.com',
+          ].includes(new URL(String(input)).origin)
         );
         assert.equal(
           new Headers(init.headers).get('Authorization'),
@@ -75,6 +77,23 @@ test('status check sends only a GET and does not log credentials', async () => {
   assert.equal(calls[0]?.init.method, 'GET');
   assert.match(calls[0]?.url ?? '', /:fetchStatus$/);
   assert.deepEqual(messages, ['Published: 0.2.0 (PUBLISHED)']);
+});
+
+test('draft metadata diagnostics report item errors without mutating the store', async () => {
+  const { store, calls, messages } = harness([
+    {
+      uploadState: 'FAILURE',
+      itemError: ['Missing privacy disclosure', 'Invalid support URL'],
+    },
+  ]);
+  await store.diagnoseMetadata();
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0]?.init.method, 'GET');
+  assert.match(calls[0]?.url ?? '', /projection=DRAFT$/);
+  assert.deepEqual(messages, [
+    'Draft metadata: Missing privacy disclosure',
+    'Draft metadata: Invalid support URL',
+  ]);
 });
 
 test('release uploads the package and submits it for normal review', async () => {

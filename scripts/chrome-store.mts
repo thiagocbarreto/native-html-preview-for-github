@@ -184,6 +184,37 @@ export function createStore(
     return object(await response.json());
   }
 
+  async function diagnoseMetadata(): Promise<void> {
+    const response = await dependencies
+      .fetch(
+        `https://www.googleapis.com/chromewebstore/v1.1/items/${options.itemId}?projection=DRAFT`,
+        {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${options.token}` },
+          redirect: 'error',
+          signal: AbortSignal.timeout(options.requestTimeoutMs),
+        }
+      )
+      .catch(() => {
+        throw new Error(
+          'Store metadata check failed before receiving a response'
+        );
+      });
+    if (!response.ok) {
+      throw new Error(`Store metadata check failed (HTTP ${response.status})`);
+    }
+    const result = object(await response.json());
+    const errors = result.itemError;
+    if (!Array.isArray(errors) || errors.length === 0) {
+      log('Draft metadata has no reported errors');
+      return;
+    }
+    for (const error of errors) {
+      const message = safeText(error);
+      if (message) log(`Draft metadata: ${message}`);
+    }
+  }
+
   async function status(): Promise<StoreStatus> {
     const result = await request('GET', 'fetchStatus');
     if (result.takenDown === true || result.warned === true) {
@@ -320,7 +351,7 @@ export function createStore(
     log(`Confirmed ${version}: ${submission.state}`);
   }
 
-  return { status, publish };
+  return { status, diagnoseMetadata, publish };
 }
 
 export function assertPublishAllowed(
@@ -381,8 +412,13 @@ async function main(): Promise<void> {
   log(`Log: ${logPath}`);
   try {
     const args = process.argv.slice(2);
-    if (args.length > 1 || (args[0] && args[0] !== '--publish'))
-      throw new Error('Usage: node scripts/chrome-store.mts [--publish]');
+    if (
+      args.length > 1 ||
+      (args[0] && !['--diagnose', '--publish'].includes(args[0]))
+    )
+      throw new Error(
+        'Usage: node scripts/chrome-store.mts [--diagnose|--publish]'
+      );
     const store = createStore(
       {
         publisherId: required('CWS_PUBLISHER_ID'),
@@ -406,6 +442,7 @@ async function main(): Promise<void> {
     if (args[0] !== '--publish') {
       log('Read-only store access check');
       await store.status();
+      if (args[0] === '--diagnose') await store.diagnoseMetadata();
     } else {
       const zipPath = required('CWS_ZIP_PATH');
       const manifest = object(
