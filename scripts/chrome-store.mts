@@ -25,6 +25,7 @@ interface StoreOptions {
   requestTimeoutMs: number;
   uploadPollIntervalMs: number;
   uploadPollAttempts: number;
+  blockOnWarnings: boolean;
 }
 
 interface StoreDependencies {
@@ -234,7 +235,7 @@ export function createStore(
       JSON.stringify({
         publishType: 'DEFAULT_PUBLISH',
         skipReview: false,
-        blockOnWarnings: true,
+        blockOnWarnings: options.blockOnWarnings,
       })
     );
     if (!['PENDING_REVIEW', 'PUBLISHED'].includes(String(submission.state))) {
@@ -289,6 +290,15 @@ function positiveInteger(name: string, fallback: number): number {
   return fallback;
 }
 
+function boolean(name: string, fallback: boolean): boolean {
+  const value = process.env[name];
+  if (value === undefined) return fallback;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  console.warn(`Invalid ${name}; using its default`);
+  return fallback;
+}
+
 async function main(): Promise<void> {
   const directory =
     process.env.CWS_LOG_DIR ??
@@ -319,6 +329,7 @@ async function main(): Promise<void> {
           5000
         ),
         uploadPollAttempts: positiveInteger('CWS_UPLOAD_POLL_ATTEMPTS', 12),
+        blockOnWarnings: boolean('CWS_BLOCK_ON_WARNINGS', true),
       },
       {
         fetch,

@@ -44,7 +44,7 @@ The build checks the tag, runs the full test suite, and packages a clean checkou
 
 Other callers of the [store script](../scripts/chrome-store.mts) can authorize manual tag releases with `CWS_MANUAL_PUBLISH_CONFIRMED=true` and `--publish`; the publishing opt-in and exact version-tag checks still apply. This repository's manual workflow entrypoint remains read-only.
 
-The [store script](../scripts/chrome-store.mts) skips a version already published, pending review, or staged. It refuses lower versions, another active submission, ambiguous revisions, policy-enforced items, and uploads already in progress. Upload processing has a bounded poll; review itself is not polled in a long-running Actions job. Warnings block submission.
+The [store script](../scripts/chrome-store.mts) skips a version already published, pending review, or staged. It refuses lower versions, another active submission, ambiguous revisions, policy-enforced items, and uploads already in progress. Upload processing has a bounded poll; review itself is not polled in a long-running Actions job. Warnings block submission by default. Set `CWS_BLOCK_ON_WARNINGS=false` only when the caller has explicitly accepted the store warnings for that release.
 
 ## Failure and rollback
 
@@ -52,7 +52,7 @@ For an upload or publish timeout, inspect the dashboard or run the read-only che
 
 To stop future automated writes, unset `CWS_PUBLISH_ENABLED`. To revoke authentication, disable the Google identity provider or remove its service-account IAM grant. A store rollback remains an explicit dashboard operation; see [Google's rollback procedure](https://developer.chrome.com/docs/webstore/rollback).
 
-The script logs timestamps and revision state to a private local log file; Actions saves these logs as an artifact. It never logs bearer tokens or raw API response bodies. Optional positive-integer tunables are `CWS_REQUEST_TIMEOUT_MS` (default `60000`), `CWS_UPLOAD_POLL_INTERVAL_MS` (default `5000`), and `CWS_UPLOAD_POLL_ATTEMPTS` (default `12`). Set them in the publishing job's environment if needed. `CWS_LOG_DIR` overrides the log directory.
+The script logs timestamps and revision state to a private local log file; Actions saves these logs as an artifact. It never logs bearer tokens or raw API response bodies. Optional positive-integer tunables are `CWS_REQUEST_TIMEOUT_MS` (default `60000`), `CWS_UPLOAD_POLL_INTERVAL_MS` (default `5000`), and `CWS_UPLOAD_POLL_ATTEMPTS` (default `12`). `CWS_BLOCK_ON_WARNINGS` defaults to `true`. Set these in the publishing job's environment if needed. `CWS_LOG_DIR` overrides the log directory.
 
 ## Manage the Google identities
 

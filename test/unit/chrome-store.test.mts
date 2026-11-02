@@ -22,7 +22,11 @@ const pending = {
   submittedItemRevisionStatus: revision('0.2.1', 'PENDING_REVIEW'),
 };
 
-function harness(responses: unknown[], pollAttempts = 2) {
+function harness(
+  responses: unknown[],
+  pollAttempts = 2,
+  blockOnWarnings = true
+) {
   const calls: Array<{ url: string; init: RequestInit }> = [];
   const messages: string[] = [];
   let sleeps = 0;
@@ -34,6 +38,7 @@ function harness(responses: unknown[], pollAttempts = 2) {
       requestTimeoutMs: 1000,
       uploadPollIntervalMs: 1,
       uploadPollAttempts: pollAttempts,
+      blockOnWarnings,
     },
     {
       fetch: async (input, init) => {
@@ -92,6 +97,21 @@ test('release uploads the package and submits it for normal review', async () =>
     blockOnWarnings: true,
   });
   assert.equal(messages.at(-1), 'Confirmed 0.2.1: PENDING_REVIEW');
+});
+
+test('a caller can allow store warnings without changing the default', async () => {
+  const { store, calls } = harness(
+    [
+      published,
+      { uploadState: 'SUCCEEDED', crxVersion: '0.2.1' },
+      { state: 'PENDING_REVIEW', warningInfo: [{ reason: 'fixture' }] },
+      pending,
+    ],
+    2,
+    false
+  );
+  await store.publish(zip, '0.2.1');
+  assert.equal(JSON.parse(String(calls[2]?.init.body)).blockOnWarnings, false);
 });
 
 test('rerunning an already published version does not upload again', async () => {
