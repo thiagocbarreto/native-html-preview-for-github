@@ -100,7 +100,7 @@ test('release uploads the package and submits it for normal review', async () =>
 });
 
 test('a caller can allow store warnings without changing the default', async () => {
-  const { store, calls } = harness(
+  const { store, calls, messages } = harness(
     [
       published,
       { uploadState: 'SUCCEEDED', crxVersion: '0.2.1' },
@@ -112,6 +112,7 @@ test('a caller can allow store warnings without changing the default', async () 
   );
   await store.publish(zip, '0.2.1');
   assert.equal(JSON.parse(String(calls[2]?.init.body)).blockOnWarnings, false);
+  assert.ok(messages.includes('Store warnings accepted: 1'));
 });
 
 test('rerunning an already published version does not upload again', async () => {

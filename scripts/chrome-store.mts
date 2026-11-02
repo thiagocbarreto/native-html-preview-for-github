@@ -243,6 +243,13 @@ export function createStore(
         'Unexpected submission state; inspect the dashboard before retrying'
       );
     }
+    if (
+      !options.blockOnWarnings &&
+      Array.isArray(submission.warningInfo) &&
+      submission.warningInfo.length > 0
+    ) {
+      log(`Store warnings accepted: ${submission.warningInfo.length}`);
+    }
     const after = await status();
     const confirmed = [after.submitted, after.published].some(
       (item) => item?.version === version && item.state === submission.state
