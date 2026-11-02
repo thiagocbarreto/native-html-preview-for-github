@@ -41,24 +41,52 @@ function object(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
+function safeText(value: unknown): string | undefined {
+  if (typeof value !== 'string') return;
+  return value
+    .replace(/[\r\n\t]+/g, ' ')
+    .replace(/(?:Bearer\s+|ya29\.|AIza)[A-Za-z0-9._-]+/g, '[REDACTED]')
+    .slice(0, 500);
+}
+
 function safeStoreError(value: unknown): string | undefined {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return;
   const error = Reflect.get(value, 'error');
   if (!error || typeof error !== 'object' || Array.isArray(error)) return;
-  const status = Reflect.get(error, 'status');
-  const message = Reflect.get(error, 'message');
   const parts: string[] = [];
+  const status = Reflect.get(error, 'status');
   if (typeof status === 'string' && /^[A-Z_]+$/.test(status))
     parts.push(status);
-  if (typeof message === 'string') {
-    parts.push(
-      message
-        .replace(/[\r\n\t]+/g, ' ')
-        .replace(/(?:Bearer\s+|ya29\.|AIza)[A-Za-z0-9._-]+/g, '[REDACTED]')
-        .slice(0, 500)
-    );
+  const message = safeText(Reflect.get(error, 'message'));
+  if (message) parts.push(message);
+  const details = Reflect.get(error, 'details');
+  if (Array.isArray(details)) {
+    for (const detail of details) {
+      if (!detail || typeof detail !== 'object' || Array.isArray(detail))
+        continue;
+      const reason = safeText(Reflect.get(detail, 'reason'));
+      const description = safeText(Reflect.get(detail, 'description'));
+      if (reason) parts.push(reason);
+      if (description) parts.push(description);
+      const violations = Reflect.get(detail, 'fieldViolations');
+      if (!Array.isArray(violations)) continue;
+      for (const violation of violations) {
+        if (
+          !violation ||
+          typeof violation !== 'object' ||
+          Array.isArray(violation)
+        )
+          continue;
+        const field = safeText(Reflect.get(violation, 'field'));
+        const violationDescription = safeText(
+          Reflect.get(violation, 'description')
+        );
+        if (field) parts.push(field);
+        if (violationDescription) parts.push(violationDescription);
+      }
+    }
   }
-  return parts.length > 0 ? parts.join(': ') : undefined;
+  return parts.length > 0 ? [...new Set(parts)].join(': ') : undefined;
 }
 
 export function versionParts(version: string): number[] {
@@ -268,12 +296,17 @@ export function createStore(
         'Unexpected submission state; inspect the dashboard before retrying'
       );
     }
+    const warningInfo = submission.warningInfo;
+    const warnings =
+      warningInfo && typeof warningInfo === 'object'
+        ? Reflect.get(warningInfo, 'warnings')
+        : undefined;
     if (
       !options.blockOnWarnings &&
-      Array.isArray(submission.warningInfo) &&
-      submission.warningInfo.length > 0
+      Array.isArray(warnings) &&
+      warnings.length > 0
     ) {
-      log(`Store warnings accepted: ${submission.warningInfo.length}`);
+      log(`Store warnings accepted: ${warnings.length}`);
     }
     const after = await status();
     const confirmed = [after.submitted, after.published].some(

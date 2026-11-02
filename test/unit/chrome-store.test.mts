@@ -104,7 +104,10 @@ test('a caller can allow store warnings without changing the default', async () 
     [
       published,
       { uploadState: 'SUCCEEDED', crxVersion: '0.2.1' },
-      { state: 'PENDING_REVIEW', warningInfo: [{ reason: 'fixture' }] },
+      {
+        state: 'PENDING_REVIEW',
+        warningInfo: { warnings: [{ reason: 'fixture' }] },
+      },
       pending,
     ],
     2,
@@ -242,7 +245,19 @@ test('HTTP failures expose only a sanitized store error summary', async () => {
         error: {
           status: 'INVALID_ARGUMENT',
           message: 'Fix the listing before retrying ya29.fixture-secret',
-          ignored: 'private diagnostic details',
+          details: [
+            {
+              reason: 'LISTING_INCOMPLETE',
+              description: 'A store listing field is missing',
+              fieldViolations: [
+                {
+                  field: 'listing',
+                  description: 'Complete the listing before publishing',
+                },
+              ],
+              ignored: 'private diagnostic details',
+            },
+          ],
         },
       },
       { status: 400 }
@@ -251,6 +266,8 @@ test('HTTP failures expose only a sanitized store error summary', async () => {
   await assert.rejects(store.status(), (error) => {
     assert.ok(error instanceof Error);
     assert.match(error.message, /INVALID_ARGUMENT: Fix the listing/);
+    assert.match(error.message, /LISTING_INCOMPLETE/);
+    assert.match(error.message, /Complete the listing before publishing/);
     assert.match(error.message, /\[REDACTED\]/);
     assert.doesNotMatch(error.message, /fixture-secret|private diagnostic/);
     return true;
